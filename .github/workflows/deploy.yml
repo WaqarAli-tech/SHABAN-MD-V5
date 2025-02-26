@@ -10,7 +10,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
@@ -25,9 +24,13 @@ jobs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ matrix.node-version }}
+        cache: 'npm'  # Cache dependencies to speed up builds
 
     - name: Install dependencies
-      run: npm install
+      run: npm ci  # `npm ci` is faster and better for CI/CD
+
+    - name: Run Tests
+      run: npm test  # Ensure everything is working before running the app
 
     - name: Start application
       run: npm start
