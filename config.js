@@ -1,44 +1,27 @@
-const { WAConnection, MessageType } = require("@whiskeysockets/baileys");
-const config = require("./config");
+const fs = require("fs");
+require("dotenv").config();
 
-const conn = new WAConnection();
-
-conn.on("group-participants.update", async (update) => {
-    const { id, participants, action } = update;
-    
-    if (config.groupSettings.autoWelcome && action === "add") {
-        let welcomeMessage = config.messages.welcome.replace("@user", `@${participants[0].split("@")[0]}`);
-        await conn.sendMessage(id, welcomeMessage, MessageType.text, { mentions: participants });
-    }
-
-    if (config.groupSettings.autoRemove && action === "remove") {
-        let farewellMessage = config.messages.farewell.replace("@user", `@${participants[0].split("@")[0]}`);
-        await conn.sendMessage(id, farewellMessage, MessageType.text, { mentions: participants });
-    }
-});
-
-conn.on("chat-update", async (chat) => {
-    if (!chat.hasNewMessage) return;
-    let message = chat.messages.all()[0];
-    let sender = message.key.participant || message.key.remoteJid;
-    let isAdmin = true; // Add logic to check if the sender is an admin
-    
-    if (message.message.conversation.startsWith("!tagall") && config.groupSettings.tagAll) {
-        let group = await conn.groupMetadata(message.key.remoteJid);
-        let mentions = group.participants.map((p) => p.jid);
-        await conn.sendMessage(message.key.remoteJid, config.messages.tagAll, MessageType.text, { mentions });
-    }
-
-    if (message.message.conversation.startsWith("!remove") && isAdmin) {
-        let userToRemove = message.message.conversation.split(" ")[1] + "@s.whatsapp.net";
-        await conn.groupRemove(message.key.remoteJid, [userToRemove]);
-        await conn.sendMessage(message.key.remoteJid, config.messages.removed.replace("@user", `@${userToRemove.split("@")[0]}`), MessageType.text, { mentions: [userToRemove] });
-    }
-});
-
-async function startBot() {
-    await conn.connect();
-    console.log("Bot is running...");
+function convertToBool(text, fault = "true") {
+    return text === fault ? true : false;
 }
 
-startBot();
+module.exports = {
+    SESSION_ID: process.env.SESSION_ID || "SHABAN-MD~QpxhUDTB#oE-D_EtQyJNK0VF3gGZLJvO57E3aK4ECR1nIfHe2fLU", // Bot session ID
+
+    BOT_NAME: process.env.BOT_NAME || "SHABAN-SOBX-MD",
+    OWNER_NUMBER: process.env.OWNER_NUMBER || "1234567890@s.whatsapp.net", // Replace with your WhatsApp number
+
+    GROUP_SETTINGS: {
+        TAG_ALL: convertToBool(process.env.TAG_ALL, "true"), // Enable/Disable .tagall
+        WELCOME_NEW: convertToBool(process.env.WELCOME_NEW, "true"), // Enable/Disable welcome messages
+        REMOVE_MEMBER: convertToBool(process.env.REMOVE_MEMBER, "true"), // Enable/Disable .remove
+    },
+
+    MESSAGES: {
+        WELCOME: "🎉 Welcome @user to the group! Enjoy your stay.",
+        FAREWELL: "👋 Goodbye @user! We'll miss you.",
+        NO_ADMIN: "🚫 You need to be an admin to use this command!",
+        TAG_ALL: "🔔 Attention everyone! ⬇️",
+        REMOVED: "❌ @user has been removed from the group!",
+    }
+};
