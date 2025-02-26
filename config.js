@@ -8,8 +8,8 @@ function convertToBool(text, fault = "true") {
 module.exports = {
     SESSION_ID: process.env.SESSION_ID || "SHABAN-MD~QpxhUDTB#oE-D_EtQyJNK0VF3gGZLJvO57E3aK4ECR1nIfHe2fLU", // Bot session ID
 
-    BOT_NAME: process.env.BOT_NAME || "SHABAN-SOBX-MD",
-    OWNER_NUMBER: process.env.OWNER_NUMBER || "1234567890@s.whatsapp.net", // Replace with your WhatsApp number
+    BOT_NAME: process.env.BOT_NAME || "𝓦𝓪𝓺𝓪𝓻 𝓐𝓱𝓶𝓪𝓭",
+    OWNER_NUMBER: process.env.OWNER_NUMBER || "923282689983", // Replace with your WhatsApp number
 
     GROUP_SETTINGS: {
         TAG_ALL: convertToBool(process.env.TAG_ALL, "true"), // Enable/Disable .tagall
